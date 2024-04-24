@@ -1,5 +1,6 @@
 import pygame as p
 import sys
+from random import randrange
 
 width = 1200
 hight = 800
@@ -12,7 +13,8 @@ class Player(p.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = width/2
         self.rect.bottom = hight - 30
-    
+        self.life = 3
+        
     def right(self):
         self.rect.x += 15
         if self.rect.left > width:
@@ -38,12 +40,38 @@ class Player(p.sprite.Sprite):
         All_Sprites.add(bullet)
         Bullets.add(bullet)
 
+    def newlife(self):
+        self.life -= 1
+        if self.life == 0:
+            sys.exit()
+        else:
+            self.rect.centerx = width/2
+            self.rect.bottom = hight - 30
 
+class Mob(p.sprite.Sprite):
+    def __init__(self):
+        p.sprite.Sprite.__init__(self)
+        self.image = p.Surface((30, 30))
+        self.image.fill((166, 27, 27))
+        self.rect = self.image.get_rect()
+        self.rect.x = randrange(width - self.rect.width)
+        self.rect.y = randrange(-100, -30)
+        self.speedx = randrange(-2, 3)
+        self.speedy = randrange(3, 10)
+        
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > hight or self.rect.right < 0:
+            self.rect.x = randrange(width - self.rect.width)
+            self.rect.y = randrange(-100, -30)
+            self.speedy = randrange(1, 10)
+            
 class Bullet(p.sprite.Sprite):
     def __init__(self, x, y):
         p.sprite.Sprite.__init__(self)
-        self.image = p.Surface((10,10))
-        self.image.fill((230,187,18))
+        self.image = p.Surface((10, 10))
+        self.image.fill((230, 187, 18))
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
@@ -51,14 +79,6 @@ class Bullet(p.sprite.Sprite):
         self.rect.y -= 10
         if self.rect.bottom < 0:
             self.kill()
-
-p.init()
-screen = p.display.set_mode((width, hight))
-clock = p.time.Clock()
-square = Player()
-All_Sprites = p.sprite.Group()
-All_Sprites.add(square)
-Bullets = p.sprite.Group()
 
 def control():
     for event in p.event.get():
@@ -72,9 +92,9 @@ def control():
         square.down()
     elif p.key.get_pressed()[p.K_w]:
         square.up()
-    elif p.key.get_pressed()[p.K_e]:
+    pressed = p.mouse.get_pressed()
+    if pressed[0]:
         square.fire()
-
 
 def start():
     global screen, All_Sprites
@@ -83,6 +103,29 @@ def start():
         control()
         screen.fill((0, 0, 0))
         All_Sprites.update()
+        hits = p.sprite.spritecollide(square, Mobs, False)
+        if hits:
+            square.newlife()
+        kills = p.sprite.groupcollide(Mobs, Bullets, True, True)
+        for mob in kills:
+            mob = Mob()
+            All_Sprites.add(mob)
+            Mobs.add(mob)
         All_Sprites.draw(screen)
         p.display.flip()
+
+p.init()
+screen = p.display.set_mode((width, hight))
+clock = p.time.Clock()
+square = Player()
+All_Sprites = p.sprite.Group()
+All_Sprites.add(square)
+Bullets = p.sprite.Group()
+Mobs = p.sprite.Group()
+
+for i in range(10):
+    mob = Mob()
+    All_Sprites.add(mob)
+    Mobs.add(mob)
+    
 start()
