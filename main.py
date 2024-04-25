@@ -3,7 +3,8 @@ import sys
 from random import randrange
 width = 1200
 hight = 800
-life = 3 
+life = 3
+restart = False
 
 class Player(p.sprite.Sprite):
     def __init__(self):
@@ -85,21 +86,31 @@ def motion():
         square.down()
     elif p.key.get_pressed()[p.K_w]:
         square.up()
-    pressed = p.mouse.get_pressed()
-    if pressed[0]:
+    if p.mouse.get_pressed()[0]:
         square.fire()
 
-def window():
+def lose_window():
+    global restart
     while True:
         control()
         screen.fill((0,0,0))
-        label = p.font.SysFont('arial', 36)
-        lose_label = label.render('Вы проиграли', True, (255, 255, 255))
-        screen.blit(lose_label,(width/2.5, hight/2))
+        lose = p.font.SysFont('arial', 80)
+        restart = p.font.SysFont('arial', 40)
+        lose_label = lose.render('Вы проиграли', True, (255, 255, 255))
+        restart_label = restart.render('Начать заново', True, (255, 255, 255))
+        restart_label_rect = restart_label.get_rect(topleft = (507, 320))
+        screen.blit(lose_label,(410, 180))
+        screen.blit(restart_label, restart_label_rect)
         p.display.flip()
+        if restart_label_rect.collidepoint(p.mouse.get_pos()) and p.mouse.get_pressed()[0]:
+            restart = True
+            break
+    start()
         
 def start():
-    global screen, All_Sprites, life
+    global screen, All_Sprites, life, restart
+    if restart:
+        life = 4
     while True:
         clock.tick(30)
         control()
@@ -121,8 +132,23 @@ def start():
             Mobs.add(mob)
         All_Sprites.draw(screen)
         p.display.flip()
-    window()
+    lose_window()
 
+def hello_window():
+    while True:
+        control()
+        screen.fill((0,0,0))
+        hello = p.font.SysFont('arial', 80)
+        first_start = p.font.SysFont('arial', 40)
+        hello_label = hello.render('Добро пожаловать', True, (255, 255, 255))
+        start_label = first_start.render('Начать игру', True, (255, 255, 255))
+        start_label_rect = start_label.get_rect(topleft = (507, 320))
+        screen.blit(hello_label,(330, 180))
+        screen.blit(start_label, start_label_rect)
+        p.display.flip()
+        if start_label_rect.collidepoint(p.mouse.get_pos()) and p.mouse.get_pressed()[0]:
+            break
+    start()
 
 p.init()
 screen = p.display.set_mode((width, hight))
@@ -138,4 +164,4 @@ for i in range(10):
     All_Sprites.add(mob)
     Mobs.add(mob)
     
-start()
+hello_window()
