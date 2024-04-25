@@ -1,8 +1,6 @@
 import pygame as p
 import sys
 from random import randrange
-from random import randrange
-
 width = 1200
 hight = 800
 life = 3 
