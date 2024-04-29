@@ -1,16 +1,21 @@
 import pygame as p
 import sys
 from random import randrange
+from os import path
+
 width = 1200
 hight = 800
 life = 3
 restart = False
 
+img_dir = path.join(path.dirname(__file__), 'img')
+
 class Player(p.sprite.Sprite):
     def __init__(self):
         p.sprite.Sprite.__init__(self)
-        self.image = p.Surface((50,50))
-        self.image.fill((75,124,153))
+        self.image = p.image.load(path.join(img_dir, 'КорабльGame.png')).convert()
+        self.image = p.transform.scale(self.image, (100, 100))
+        self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.centerx = width/2
         self.rect.bottom = hight - 30
@@ -43,8 +48,9 @@ class Player(p.sprite.Sprite):
 class Mob(p.sprite.Sprite):
     def __init__(self):
         p.sprite.Sprite.__init__(self)
-        self.image = p.Surface((30, 30))
-        self.image.fill((166, 27, 27))
+        self.image = p.image.load(path.join(img_dir, 'ВрагGame.png')).convert()
+        self.image = p.transform.scale(self.image, (70, 70))
+        self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = randrange(width - self.rect.width)
         self.rect.y = randrange(-100, -30)
@@ -62,8 +68,9 @@ class Mob(p.sprite.Sprite):
 class Bullet(p.sprite.Sprite):
     def __init__(self, x, y):
         p.sprite.Sprite.__init__(self)
-        self.image = p.Surface((10, 10))
-        self.image.fill((230, 187, 18))
+        self.image = p.image.load(path.join(img_dir, 'ПуляGame.png')).convert()
+        self.image = p.transform.scale(self.image, (20, 20))
+        self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
@@ -116,6 +123,9 @@ def start():
         control()
         motion()
         screen.fill((0, 0, 0))
+        background = p.image.load(path.join(img_dir, 'космосGame.jpg')).convert()
+        background_rect = background.get_rect()
+        screen.blit(background, background_rect)
         All_Sprites.update()
         hits = p.sprite.spritecollide(square, Mobs, False)
         if hits:
