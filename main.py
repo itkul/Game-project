@@ -3,10 +3,10 @@ import sys
 from random import randrange
 from os import path
 
-img_dir = path.join(path.dirname(__file__), 'img')
+img_dir = path.join(path.dirname(__file__), 'img')   # загрузка изображений
 
-class Game:
-    def __init__(self):
+class Game:   # класс со всеми функциями, связанными с игрой
+    def __init__(self):   
         self.width = 1200
         self.hight = 800
         self.kill_counter = 0
@@ -18,7 +18,7 @@ class Game:
         self.Bullets = p.sprite.Group()
         self.Mobs = p.sprite.Group()
 
-    def lose_window(self):
+    def lose_window(self):   # создание окна проигрыша
         while True:
             self.control()
             background = p.image.load(path.join(img_dir, 'ПроигрышGame.jpg')).convert()
@@ -42,7 +42,7 @@ class Game:
                 sys.exit()
         self.start()
         
-    def start(self):
+    def start(self):  # запускает саму игру
         if self.restart:
             self.life = 3
             self.kill_counter = 0
@@ -51,7 +51,7 @@ class Game:
             player.rect.centerx = self.width/2
             player.rect.bottom = self.hight - 30
         self.All_Sprites.add(player)
-        while True:
+        while True:  # бесконечный цикл игры
             self.clock.tick(30)
             self.control()
             self.motion()
@@ -59,16 +59,16 @@ class Game:
             background_rect = background.get_rect()
             self.screen.blit(background, background_rect)
             self.All_Sprites.update()
-            hits = p.sprite.spritecollide(player, self.Mobs, False)
+            hits = p.sprite.spritecollide(player, self.Mobs, False)  # столкновение игрока и моба
             if hits:
-                self.life -= 1
+                self.life -= 1   # уменьшение счётчика жизней
                 if self.life == 0:
                     break
                 else:
                     player.rect.centerx = self.width/2
                     player.rect.bottom = self.hight - 30
-            kills = p.sprite.groupcollide(self.Mobs, self.Bullets, True, True)
-            for mob in kills:
+            kills = p.sprite.groupcollide(self.Mobs, self.Bullets, True, True)   # стоклновение мобов и пуль
+            for mob in kills:  
                 mob = Mob()
                 self.All_Sprites.add(mob)
                 self.Mobs.add(mob)
@@ -80,7 +80,7 @@ class Game:
             p.display.flip()
         self.lose_window()
 
-    def hello_window(self):
+    def hello_window(self):   # создание начального окна
         while True:
             self.control()
             background = p.image.load(path.join(img_dir, 'ДобропожаловатьGame.jpg')).convert()
@@ -98,12 +98,12 @@ class Game:
                 break
         self.start()
         
-    def control(self):
+    def control(self):  # закрытие окна через крестик
         for event in p.event.get():
             if event.type == p.QUIT:
                 sys.exit()
 
-    def motion(self):
+    def motion(self):   # движение игрока через клавиатуру и стрельба через левую кнопку мыши
         if p.key.get_pressed()[p.K_d]:
             player.right()
         elif p.key.get_pressed()[p.K_a]:
@@ -115,7 +115,7 @@ class Game:
         if p.mouse.get_pressed()[0]:
             player.fire()
 
-    def lives(self, x, y):
+    def lives(self, x, y):  # счётчик жизней
         img = p.image.load(path.join(img_dir, 'ЖизниGame.png')).convert_alpha()
         for i in range(self.life):
             img_rect = img.get_rect()
@@ -123,7 +123,7 @@ class Game:
             img_rect.y = y
             self.screen.blit(img, img_rect)
 
-    def count_mob(self):
+    def count_mob(self):   # счётчик мобов 
         img_counter = p.image.load(path.join(img_dir, 'ВрагGame.png')).convert_alpha()
         img_counter = p.transform.scale(img_counter, (70, 70))
         img_counter_rect = img_counter.get_rect()
@@ -134,7 +134,7 @@ class Game:
         self.screen.blit(img_counter, img_counter_rect)
         self.screen.blit(counter_label, (120, 90))
 
-class Player(p.sprite.Sprite):
+class Player(p.sprite.Sprite):   # класс со всеми функциями, связанными с игроком 
     def __init__(self):
         p.sprite.Sprite.__init__(self)
         self.image = p.image.load(path.join(img_dir, 'КорабльGame.png')).convert_alpha()
@@ -143,32 +143,32 @@ class Player(p.sprite.Sprite):
         self.rect.centerx = game.width/2
         self.rect.bottom = game.hight - 30
         
-    def right(self):
+    def right(self):  # движение вправо
         self.rect.x += 15
         if self.rect.left > game.width:
             self.rect.right = 0
     
-    def left(self):
+    def left(self):   # движение влево
         self.rect.x -= 15
         if self.rect.right < 0:
             self.rect.left = game.width
     
-    def down(self):
+    def down(self):   # движение вниз
         self.rect.y += 15
         if self.rect.bottom > game.hight:
             self.rect.top = 0
 
-    def up(self):
+    def up(self):   # движение вверх
         self.rect.y -= 15
         if self.rect.top < 0:
             self.rect.bottom = game.hight
     
-    def fire(self):
+    def fire(self):  # стрельба
         bullet = Bullet(self.rect.centerx, self.rect.top)
         game.All_Sprites.add(bullet)
         game.Bullets.add(bullet)
 
-class Mob(p.sprite.Sprite):
+class Mob(p.sprite.Sprite): # класс со всеми функциями, связанными с мобами
     def __init__(self):
         p.sprite.Sprite.__init__(self)
         self.image = p.image.load(path.join(img_dir, 'ВрагGame.png')).convert_alpha()
@@ -179,7 +179,7 @@ class Mob(p.sprite.Sprite):
         self.speedx = randrange(-2, 3)
         self.speedy = randrange(3, 10)
         
-    def update(self):
+    def update(self):   # движение мобов
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top > game.hight or self.rect.right < 0:
@@ -187,12 +187,12 @@ class Mob(p.sprite.Sprite):
             self.rect.y = randrange(-100, -30)
             self.speedy = randrange(1, 10)
     
-    def restart(self):
+    def restart(self):  # возвращение всех мобов на "начальную позицию"
         self.rect.x = randrange(game.width - self.rect.width)
         self.rect.y = randrange(-100, -30)
         self.speedy = randrange(1, 10)
 
-class Bullet(p.sprite.Sprite):
+class Bullet(p.sprite.Sprite):  # класс со всеми функциями, связанными с пулями
     def __init__(self, x, y):
         p.sprite.Sprite.__init__(self)
         self.image = p.image.load(path.join(img_dir, 'ПуляGame.png')).convert_alpha()
@@ -201,7 +201,7 @@ class Bullet(p.sprite.Sprite):
         self.rect.centerx = x
         self.rect.bottom = y
 
-    def update(self):
+    def update(self):  # движение пуль
         self.rect.y -= 10
         if self.rect.bottom < 0:
             self.kill()
